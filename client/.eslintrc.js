@@ -34,6 +34,7 @@ module.exports = {
         // Too restrictive: https://github.com/yannickcr/eslint-plugin-react/blob/master/docs/rules/destructuring-assignment.md
         'react/destructuring-assignment': 'off',
         "import/extensions": ['error', 'never'],
+        "react/require-default-props": 'off',
         // Use function hoisting to improve code readability
         'no-use-before-define': [
             'error',

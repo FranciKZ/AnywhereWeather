@@ -1,11 +1,23 @@
-import React from 'react';
-import './App.css';
-import MapContainer from './Components/MapContainer';
+import React, { useState } from 'react';
+import MapContainer from './components/MapContainer';
+import Forecast from './components/Forecast';
 //
+
+type PositionalDataType = {
+  lat?: number;
+  lng?: number;
+};
+
 function App() {
+  const [positionalData, setPositionalData] = useState<PositionalDataType>({
+    lat: undefined,
+    lng: undefined,
+  });
+
   return (
-    <div className="App">
-      <MapContainer />
+    <div>
+      <MapContainer setPositionalData={setPositionalData} />
+      <Forecast lat={positionalData.lat} lng={positionalData.lng} />
     </div>
   );
 }
