@@ -13,9 +13,7 @@ async function getForecast(
   lng?: number
 ): Promise<WeatherInfo | undefined> {
   if (lat && lng) {
-    const result = await fetch(
-      `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lng}&appid=`
-    );
+    const result = await fetch(`/api/weather?latitude=${lat}&longitude=${lng}`);
     return result.json();
   }
   return undefined;
