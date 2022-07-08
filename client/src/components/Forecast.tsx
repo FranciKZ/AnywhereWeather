@@ -1,11 +1,26 @@
 import React, { useEffect, useState } from 'react';
+import {
+  Drawer,
+  DrawerBody,
+  DrawerCloseButton,
+  DrawerContent,
+  DrawerHeader,
+  DrawerOverlay,
+  Stack,
+  Radio,
+  RadioGroup,
+  Box,
+  Flex,
+} from '@chakra-ui/react';
 import WeatherInfo from '../models/weatherInfo';
+import PositionalDataType from '../models/positionalData';
 
-type TemperatureUnit = 'fahrenheit' | 'celsius';
+type TemperatureUnit = 'fahrenheit' | 'celsius' | 'kelvin';
 
 type ForecastProps = {
   lat?: number;
   lng?: number;
+  setPositionalData: (positionalData: PositionalDataType) => void;
 };
 
 async function getForecast(
@@ -24,12 +39,15 @@ function convertUnits(toUnit: TemperatureUnit, value?: number) {
     if (toUnit === 'fahrenheit') {
       return (value * 1.8 - 459.67).toFixed(0);
     }
-    return value - 273.15;
+    if (toUnit === 'kelvin') {
+      return value;
+    }
+    return (value - 273.15).toFixed(0);
   }
   return undefined;
 }
 
-function Forecast({ lat, lng }: ForecastProps) {
+function Forecast({ lat, lng, setPositionalData }: ForecastProps) {
   const [result, setResult] = useState<WeatherInfo | undefined>(undefined);
   const [tempUnit, setTempUnit] = useState<TemperatureUnit>('fahrenheit');
 
@@ -37,33 +55,59 @@ function Forecast({ lat, lng }: ForecastProps) {
     getForecast(lat, lng).then((json) => setResult(json));
   }, [lat, lng]);
 
+  const handleRadioChange = (value: string) => {
+    setTempUnit(value as TemperatureUnit);
+  };
+
   return (
-    <div
-      style={{
-        height: '100vh',
-        width: !lat || !lng || !result ? '0vh' : '40vh',
-        visibility: !lat || !lng || !result ? 'hidden' : 'visible',
-        position: 'relative',
-        background: 'rgba(255,250,250, 0.8)',
-        display: 'grid',
-      }}
+    <Drawer
+      isOpen={!!lat && !!lng}
+      onClose={() => setPositionalData({ lat: undefined, lng: undefined })}
+      size="sm"
+      isFullHeight={false}
     >
-      <h3 style={{ fontSize: '1.5rem', margin: '0 auto' }}>
-        Weather at {lat?.toFixed(4)}, {lng?.toFixed(4)}
-      </h3>
-      <p>
-        {result?.weather[0].main} - {result?.weather[0].description}
-      </p>
-      <ul>
-        <li>Current Temp: {convertUnits(tempUnit, result?.main.temp)}</li>
-        <li>Feels Like: {convertUnits(tempUnit, result?.main.feels_like)}</li>
-        <li>Low of: {convertUnits(tempUnit, result?.main.temp_min)}</li>
-        <li>High of: {convertUnits(tempUnit, result?.main.temp_max)}</li>
-      </ul>
-      <button type="button" onClick={() => setResult(undefined)}>
-        close
-      </button>
-    </div>
+      <DrawerOverlay />
+      <DrawerContent>
+        <DrawerCloseButton />
+        <DrawerBody opacity={0.8}>
+          <DrawerHeader>
+            Weather at {lat?.toFixed(4)}, {lng?.toFixed(4)}
+          </DrawerHeader>
+          <RadioGroup onChange={handleRadioChange} value={tempUnit}>
+            <Stack direction="row">
+              <Radio value="celsius">Celsius</Radio>
+              <Radio value="fahrenheit">Fahrenheit</Radio>
+              <Radio value="kelvin">Kelvin</Radio>
+            </Stack>
+          </RadioGroup>
+          <Flex align="center" justify="center">
+            <Box
+              p={5}
+              mt={5}
+              border="1px"
+              borderColor="gray.500"
+              borderRadius={2}
+            >
+              <p>
+                {result?.weather[0].main} - {result?.weather[0].description}
+              </p>
+              <ul>
+                <li>
+                  Current Temp: {convertUnits(tempUnit, result?.main.temp)}
+                </li>
+                <li>
+                  Feels Like: {convertUnits(tempUnit, result?.main.feels_like)}
+                </li>
+                <li>Low of: {convertUnits(tempUnit, result?.main.temp_min)}</li>
+                <li>
+                  High of: {convertUnits(tempUnit, result?.main.temp_max)}
+                </li>
+              </ul>
+            </Box>
+          </Flex>
+        </DrawerBody>
+      </DrawerContent>
+    </Drawer>
   );
 }
 

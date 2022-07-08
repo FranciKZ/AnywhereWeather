@@ -1,12 +1,8 @@
 import React, { useState } from 'react';
+import { ChakraProvider } from '@chakra-ui/react';
 import MapContainer from './components/MapContainer';
 import Forecast from './components/Forecast';
-//
-
-type PositionalDataType = {
-  lat?: number;
-  lng?: number;
-};
+import PositionalDataType from './models/positionalData';
 
 function App() {
   const [positionalData, setPositionalData] = useState<PositionalDataType>({
@@ -15,10 +11,16 @@ function App() {
   });
 
   return (
-    <div>
-      <MapContainer setPositionalData={setPositionalData} />
-      <Forecast lat={positionalData.lat} lng={positionalData.lng} />
-    </div>
+    <ChakraProvider>
+      <div>
+        <MapContainer setPositionalData={setPositionalData} />
+        <Forecast
+          lat={positionalData.lat}
+          lng={positionalData.lng}
+          setPositionalData={setPositionalData}
+        />
+      </div>
+    </ChakraProvider>
   );
 }
 

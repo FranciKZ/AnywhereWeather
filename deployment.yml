@@ -1,0 +1,21 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: anywhere-weather
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      name: anywhere-weather
+  template:
+    metadata:
+      labels:
+        name: anywhere-weather
+    spec:
+      containers:
+        - name: application
+          image: kollinzcfrancis/anywhere-weather
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
